@@ -25,6 +25,28 @@ var userSchema = new mongoose.Schema({
 // user.generateToken  -  generate a JWT token
 // user.makeAdmin
 
+userSchema.statics.isLoggedIn = (req, res, next) => {
+  var token = req.cookies.accessToken;
+
+  jwt.verify(token, JWT_SECRET, (err, payload) => {
+    if(err) return res.status(401).send({error: 'Authentication required.'});
+
+    User.findById(payload._id, (err, user) => {
+      if(err || !user) return res.status(401).send({error: 'User not found.'});
+
+      req.user = user;
+      next();
+
+    }).select('-password');
+  });
+};
+
+userSchema.statics.isAdmin = (req, res, next) => {
+  if(!req.user.admin) {
+    return res.status(403).send({error: 'Not authorized.'});
+  }
+  next();
+};
 
 userSchema.statics.register = (userObj, cb) => {
   User.findOne({email: userObj.email}, (err, dbUser) => {
