@@ -46,25 +46,28 @@ userSchema.statics.register = (userObj, cb) => {
   });
 };
 
-// user.generateToken()
+userSchema.statics.authenticate = (userObj, cb) => {
+  User.findOne({email: userObj.email}, (err, dbUser) => {
+    if(err || !dbUser) return cb(err || { error: 'Authentication failed.  Invalid email or password.' });
+
+    bcrypt.compare(userObj.password, dbUser.password, (err, isGood) => {
+      if(err || !isGood) return cb(err || { error: 'Authentication failed.  Invalid email or password.' });
+
+      var token = dbUser.generateToken();
+
+      cb(null, token);
+    });
+  });
+};
 
 userSchema.methods.generateToken = function() {
   var payload = {
     _id: this._id,
     exp: moment().add(1, 'day').unix()
   };
-  
+
   return jwt.sign(payload, JWT_SECRET);
 };
-
-
-// // route
-// User.register(req.body, (err, user) => {
-
-// });
-
-
-
 
 var User = mongoose.model('User', userSchema);
 
