@@ -31,4 +31,19 @@ router.delete('/logout', (req, res) => {
   res.clearCookie('accessToken').send();
 });
 
+
+router.get('/verify/:token', (req, res) => {
+
+  console.log('token:', req.params.token);
+
+  res.send('OK!');
+
+  // verify the token
+  // get the user id from the payload
+  // verify that user
+
+
+});
+
+
 module.exports = router;

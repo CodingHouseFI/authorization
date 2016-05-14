@@ -8,12 +8,12 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
-router.get('/secret', User.isLoggedIn, (req, res) => {
+router.get('/secret', User.auth(), (req, res) => {
   console.log('req.user:', req.user);
   res.send('SECRET STUFF\n');
 });
 
-router.get('/admin', User.isLoggedIn, User.isAdmin, (req, res) => {
+router.get('/admin', User.auth('admin'), (req, res) => {
   console.log('req.user:', req.user);
   res.send('ADMIN STUFF\n'); 
 });
